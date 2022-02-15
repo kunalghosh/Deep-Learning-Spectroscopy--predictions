@@ -1,0 +1,6 @@
+2022-02-12 22:37:08,325 - DeepTensor - INFO - GOT LOGGER !
+2022-02-12 22:37:11,174 - DeepTensor - INFO - Trying to load model 'model_neu1_neu2_with_noise'
+2022-02-12 22:37:11,174 - DeepTensor - INFO - Loaded 'model_neu1_neu2_with_noise'
+2022-02-12 22:37:23,528 - DeepTensor - INFO - Expanded Test and Val.
+2022-02-12 22:37:23,528 - DeepTensor - INFO - Trying to predict
+2022-02-12 22:37:39,434 - DeepTensor - INFO - Got predictions
