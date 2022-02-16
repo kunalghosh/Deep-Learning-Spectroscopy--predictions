@@ -62,7 +62,7 @@ def get_full_path(base_dir, relative_dir):
 @click.option('--energies', 'output_dir', help="Compare the predicted energies with target", flag_value="OE62_5k_energies_output", required=True)
 @click.option('--spectra', 'output_dir', help="Compare the predicted spectra with target", flag_value="OE62_5k_spectra_output", required=True)
 @click.option('--output_dir_suffix', help="Suffix added to the output directory name to compare data in different directories.", default="")
-@click.option('--base_dir', help="Path to the directory where the data and model are stored.", default="../../"
+@click.option('--base_dir', help="Path to the directory where the data and model are stored.", default="."
 @click.option('-n', default=8, help="Number of homo values per molecule to compare")
 def main(base_dir, output_dir, n, output_dir_suffix):
 

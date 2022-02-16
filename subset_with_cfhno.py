@@ -1,6 +1,10 @@
 from ase import io
 import inspect
 import ase
+from compare_homos import get_full_path
+import functools
+
+get_full_path = functools.partial(get_full_path, base_dir="data/OE62_5k")
 
 molecules = io.read("df_5k_with_energies.xyz", index=":")
 
@@ -19,7 +23,7 @@ class XYZ_writer:
            
     def write(self, mol, i):
         self.xyz_counter(self._xyz_counter+1)
-        with open("subsets/df_5k_subset_%d_with_energies.xyz" % self.file_counter, "a") as f, open("subsets/df_5k_subset_%d_indices.txt" % self.file_counter, "a") as f2:
+        with open(get_full_path("subsets/df_5k_subset_%d_with_energies.xyz" % self.file_counter), "a") as f, open(get_full_path("subsets/df_5k_subset_%d_indices.txt") % self.file_counter, "a") as f2:
             # uses ase versin 3.13 probably because I am writing this in python  2.7
             # I need to specify the columns to prevent it from printing everything
             # argument plain=True doesn't exit. (it exists in ase version 3.19)
