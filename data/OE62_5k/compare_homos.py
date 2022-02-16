@@ -2,12 +2,11 @@ import pdb
 import json
 import numpy as np
 import click
+import functools
 
-prediction_files = ["/l/ghoshk1/rerunDTNN/%s/OE62_5k_output_subset_0/test_predictions.npz", "/l/ghoshk1/rerunDTNN/%s/OE62_5k_output_subset_1/test_predictions.npz","/l/ghoshk1/rerunDTNN/%s/OE62_5k_output_subset_2/test_predictions.npz"]
-
-index_files = ["/l/ghoshk1/rerunDTNN/data/OE62_5k/subsets/df_5k_subset_0_indices.txt", "/l/ghoshk1/rerunDTNN/data/OE62_5k/subsets/df_5k_subset_1_indices.txt", "/l/ghoshk1/rerunDTNN/data/OE62_5k/subsets/df_5k_subset_2_indices.txt"]
-xyz_files = ["/l/ghoshk1/rerunDTNN/data/OE62_5k/subsets/df_5k_subset_0_with_energies.xyz", "/l/ghoshk1/rerunDTNN/data/OE62_5k/subsets/df_5k_subset_1_with_energies.xyz", "/l/ghoshk1/rerunDTNN/data/OE62_5k/subsets/df_5k_subset_2_with_energies.xyz"]
-homo_file = "/l/ghoshk1/rerunDTNN/data/OE62_5k/df_5k_homo.txt"
+prediction_files = ["/%s/OE62_5k_output_subset_0/test_predictions.npz", "/%s/OE62_5k_output_subset_1/test_predictions.npz","/%s/OE62_5k_output_subset_2/test_predictions.npz"]
+index_files = ["/data/OE62_5k/subsets/df_5k_subset_0_indices.txt", "/data/OE62_5k/subsets/df_5k_subset_1_indices.txt", "/data/OE62_5k/subsets/df_5k_subset_2_indices.txt"]
+homo_file = "/data/OE62_5k/df_5k_homo.txt"
 
 def load_indices(index_file):
     return np.genfromtxt(index_file, dtype=np.int32)
@@ -55,22 +54,29 @@ class HOMO:
     def get_homos(self):
         return self.homos
 
+
+def get_full_path(base_dir, relative_dir):
+    return base_dir + relative_dir
+
 @click.command()
 @click.option('--energies', 'output_dir', help="Compare the predicted energies with target", flag_value="OE62_5k_energies_output", required=True)
 @click.option('--spectra', 'output_dir', help="Compare the predicted spectra with target", flag_value="OE62_5k_spectra_output", required=True)
 @click.option('--output_dir_suffix', help="Suffix added to the output directory name to compare data in different directories.", default="")
-
+@click.option('--base_dir', help="Path to the directory where the data and model are stored.", default="../../"
 @click.option('-n', default=8, help="Number of homo values per molecule to compare")
-def main(output_dir, n, output_dir_suffix):
-    output_dir = output_dir + output_dir_suffix
+def main(base_dir, output_dir, n, output_dir_suffix):
+
+    get_full_path = functools.partial(get_full_path, base_dir=base_dir) # to set one of the arguments
+    output_dir = get_full_path(output_dir + output_dir_suffix)
     print output_dir
-    homo_values = HOMO(homo_file)
+
+    homo_values = HOMO(get_full_path(homo_file))
     sum_sq_error = 0
     for idx_file, prediction_file in zip(index_files, prediction_files):
-        indices = load_indices(idx_file)
+        indices = load_indices(get_full_path(idx_file))
         homos = homo_values.get_homo(indices)
         target = get_homo_to_homo_n(homos, n)
-        predicted = load_prediction(prediction_file % (output_dir))
+        predicted = load_prediction(get_full_path(prediction_file % (output_dir)))
         predicted = predicted[:,-n:]
         # I should have used DTNN energy prediction.
         # energy code is in /l/ghoshk1/thesis/experiments/Annika_new_132k/deep_tensor_energies_mse_cost_optimized_multiple_RUNS
